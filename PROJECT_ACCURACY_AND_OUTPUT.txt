@@ -1,0 +1,48 @@
+NEXUSPAY — PROJECT ACCURACY AND OUTPUT
+Generated automatically whenever the project is started, built, or tested.
+
+1. LATEST AUTOMATED TEST RESULTS
++---------------------------------+-----------------------+
+| Measure                         | Current result        |
++---------------------------------+-----------------------+
+| Last updated                    | 2/10/2026, 5:21:11 pm |
+| Automated test run              | PASS                  |
+| Tests passed                    | 0                     |
+| Tests failed                    | 0                     |
+| Tests skipped/pending           | 0                     |
+| Total tests                     | 0                     |
+| Test pass rate (passed / total) | N/A                   |
++---------------------------------+-----------------------+
+
+Run detail: 24 test suites passed; 0 failed.
+
+Test pass rate is a software test metric, not machine-learning model accuracy. It measures passed automated checks divided by all reported tests. It does not establish banking transaction correctness in production.
+
+2. ACCURACY RUBRIC (AS SHOWN IN THE PROVIDED RUBRIC)
++-------------------------------------+---------+-----------------------------------------------------------------------------------------------+
+| Criterion                           | Maximum | Evidence / current assessment                                                                 |
++-------------------------------------+---------+-----------------------------------------------------------------------------------------------+
+| Accuracy of Results                 | 10      | Automated test pass rate: N/A; no labeled benchmark is configured.                            |
+| Technical Competence                | 10      | Not automatically scored; requires evaluator review.                                          |
+| Innovative and Sustainable Features | 10      | Not automatically scored; requires evaluator review.                                          |
+| Utility to Society                  | 10      | Not automatically scored; requires evaluator review.                                          |
+| Presentation Skills                 | 10      | Not automatically scored; requires evaluator review.                                          |
+| TOTAL                               | 50      | Only the test evidence above is updated automatically; rubric marks require human evaluation. |
++-------------------------------------+---------+-----------------------------------------------------------------------------------------------+
+
+3. PROJECT OUTPUT SUMMARY
+NexusPay provides account registration/login, multi-currency accounts, internal transfers, beneficiary management, transaction history, notifications, activity logging, and search. The PostgreSQL transfer service validates inputs and uses a database transaction and row locks; the legacy routes still require migration before all banking endpoints use PostgreSQL.
+
+Example successful transfer output (illustrative shape; live values depend on runtime data):
+{
+  "status": "completed",
+  "amount": "100.50",
+  "currency": "USD",
+  "referenceId": "TXN-<generated-reference>"
+}
+
+4. DOCUMENTATION ACCURACY NOTES
+- The search implementation uses term-frequency vectors and cosine similarity; it does not compute inverse document frequency (IDF).
+- Search currently includes transactions and activity logs; it does not include notifications.
+- The implemented search is based on lexical term overlap, not semantic embeddings.
+- Automated tests do not currently measure production transaction accuracy or search precision/recall.

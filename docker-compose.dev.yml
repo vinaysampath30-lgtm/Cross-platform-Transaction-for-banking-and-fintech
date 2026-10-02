@@ -57,7 +57,7 @@ services:
       MYSQL_PASSWORD: ${DB_MYSQL_PASSWORD:-nexuspay_dev_password}
     volumes:
       - mysql-dev-data:/var/lib/mysql
-      - ./server/db/migrations:/docker-entrypoint-initdb.d:ro
+      - ./backend/db/migrations:/docker-entrypoint-initdb.d:ro
     command:
       - --character-set-server=utf8mb4
       - --collation-server=utf8mb4_unicode_ci

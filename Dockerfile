@@ -46,6 +46,7 @@ RUN corepack enable && corepack prepare pnpm@10.4.1 --activate && \
 # Copy built application from builder
 COPY --from=builder /app/dist ./dist
 COPY --from=builder /app/data ./data
+COPY --from=builder /app/backend/db/migrations ./backend/db/migrations
 
 # Set ownership to non-root user
 RUN chown -R nexuspay:nexuspay /app

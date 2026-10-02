@@ -5,7 +5,7 @@
 
 Generated: September 21, 2026
 Project: Cross-platform Transaction for Banking and FinTech
-System Name: NexusPay (PulseBank UI)
+System Name: NexusPay 
 
 ================================================================================
                               TABLE OF CONTENTS
@@ -90,7 +90,7 @@ cross-platform-banking-ui/
 │   │   └── main.tsx          # Entry point
 │   └── public/               # Static assets
 │
-├── server/                    # Express.js backend
+├── backend/                    # Express.js backend
 │   ├── config/               # Environment, Swagger config
 │   ├── db/
 │   │   ├── models/           # Sequelize models (MySQL)
@@ -120,7 +120,7 @@ cross-platform-banking-ui/
 │   └── index.ts              # Server entry point
 │
 ├── shared/                    # Shared types/utilities
-├── tests/                     # Unit tests
+├── backend/tests/             # Backend unit tests
 ├── Dockerfile                 # Production container
 ├── docker-compose.yml         # Production orchestration
 └── vite.config.ts            # Vite configuration with API proxy
@@ -327,7 +327,7 @@ DEVELOPMENT:
 4.2 BACKEND MODULES
 --------------------------------------------------------------------------------
 
-1. AUTH MODULE (server/routes/auth-new.ts, server/services/authService.ts)
+1. AUTH MODULE (backend/routes/auth-new.ts, backend/services/authService.ts)
    RESPONSIBILITY: User registration, login, JWT issuance, password reset
 
    METHODS:
@@ -343,7 +343,7 @@ DEVELOPMENT:
    - Automatic USD account creation on registration
    - Activity logging for auth events
 
-2. ACCOUNTS MODULE (server/routes/accounts.ts, server/services/accountService.ts)
+2. ACCOUNTS MODULE (backend/routes/accounts.ts, backend/services/accountService.ts)
    RESPONSIBILITY: Account creation, balance queries, account management
 
    FEATURES:
@@ -352,7 +352,7 @@ DEVELOPMENT:
    - Account number generation (XXXX-XXXX-XXXX-XXXX format)
    - User can have one account per currency
 
-3. TRANSACTIONS MODULE (server/routes/transactions.ts, server/services/transferService.ts)
+3. TRANSACTIONS MODULE (backend/routes/transactions.ts, backend/services/transferService.ts)
    RESPONSIBILITY: Fund transfers, transaction history
 
    METHODS:
@@ -369,7 +369,7 @@ DEVELOPMENT:
    - Activity logging
    - Notification creation
 
-4. BENEFICIARIES MODULE (server/routes/beneficiaries.ts, server/services/beneficiaryService.ts)
+4. BENEFICIARIES MODULE (backend/routes/beneficiaries.ts, backend/services/beneficiaryService.ts)
    RESPONSIBILITY: Saved payees management
 
    FEATURES:
@@ -378,7 +378,7 @@ DEVELOPMENT:
    - Favorite marking
    - Nickname support
 
-5. NOTIFICATIONS MODULE (server/routes/notifications.ts, server/services/notificationService.ts)
+5. NOTIFICATIONS MODULE (backend/routes/notifications.ts, backend/services/notificationService.ts)
    RESPONSIBILITY: User alerts, notification management
 
    FEATURES:
@@ -388,7 +388,7 @@ DEVELOPMENT:
    - TTL-based auto-expiration
    - Pagination and filtering
 
-6. SEARCH MODULE (server/routes/search.ts, server/services/searchService.ts)
+6. SEARCH MODULE (backend/routes/search.ts, backend/services/searchService.ts)
    RESPONSIBILITY: Similarity-based search across transactions and activity
 
    ALGORITHM: TF-IDF + Cosine Similarity (see Section 5)
@@ -404,11 +404,11 @@ DEVELOPMENT:
 4.3 BACKEND MIDDLEWARE
 --------------------------------------------------------------------------------
 
-AUTHENTICATION MIDDLEWARE (server/middleware/auth.ts):
+AUTHENTICATION MIDDLEWARE (backend/middleware/auth.ts):
 - requireAuth()       - Validates JWT, attaches req.user
 - optionalAuth()      - Attaches req.user if token present, no rejection
 
-RATE LIMITING MIDDLEWARE (server/middleware/rateLimiter.ts):
+RATE LIMITING MIDDLEWARE (backend/middleware/rateLimiter.ts):
 - standardLimiter     - 100 requests / 15 minutes (general API)
 - authLimiter         - 5 requests / 15 minutes (login/register)
 - transferLimiter     - 10 requests / 15 minutes (fund transfers)
@@ -427,7 +427,7 @@ ERROR HANDLING:
 --------------------------------------------------------------------------------
 
 PURPOSE: Semantic search over transactions and activity logs
-LOCATION: server/services/searchService.ts
+LOCATION: backend/services/searchService.ts
 
 IMPLEMENTATION:
 
@@ -478,7 +478,7 @@ Results include transactions with similar descriptions, not just exact matches
 --------------------------------------------------------------------------------
 
 PURPOSE: Ensure money is never lost or duplicated during transfers
-LOCATION: server/services/transferService.ts
+LOCATION: backend/services/transferService.ts
 
 IMPLEMENTATION: MySQL Transaction with Row-Level Locking
 
@@ -864,7 +864,7 @@ server: {
 │                                                                          │
 └─────────────────────────────────────────────────────────────────────────┘
 
-KEY CONFIGURATION (server/index.ts):
+KEY CONFIGURATION (backend/index.ts):
 ```typescript
 if (process.env.NODE_ENV === "production") {
   const staticPath = path.resolve(__dirname, "public");

@@ -25,7 +25,7 @@ The system is built as a single Express.js application with clearly separated do
 ```
 cross-platform-banking-ui/
 ├── client/                    # React frontend (Vite)
-├── server/
+├── backend/
 │   ├── config/               # Environment, Swagger config
 │   ├── db/
 │   │   ├── models/           # Sequelize models (MySQL)
@@ -53,7 +53,7 @@ cross-platform-banking-ui/
 │   ├── utils/                # Utilities (UUID helpers)
 │   ├── validation/           # Zod schemas
 │   └── index.ts              # Entry point
-├── tests/                    # Unit tests
+├── backend/tests/            # Backend unit tests
 ├── Dockerfile                # Production container
 ├── Dockerfile.dev            # Development container
 ├── docker-compose.yml        # Production compose
@@ -356,7 +356,7 @@ Transfer Saga:
 
 Interactive API documentation is available at `/api/docs` when the server is running.
 
-The Swagger spec is generated from JSDoc comments in route files and the central configuration in `server/config/swagger.ts`.
+The Swagger spec is generated from JSDoc comments in route files and the central configuration in `backend/config/swagger.ts`.
 
 ---
 
