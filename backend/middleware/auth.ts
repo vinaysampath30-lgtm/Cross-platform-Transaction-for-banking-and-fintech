@@ -33,31 +33,7 @@ export function requireAuth(
   res: Response,
   next: NextFunction
 ): void {
-  const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    res.status(401).json({ error: "Authentication required. Please log in." });
-    return;
-  }
-
-  const token = authHeader.slice(7); // Remove "Bearer " prefix
-
-  try {
-    const decoded = jwt.verify(token, env.jwtSecret) as JwtPayload;
-    req.user = decoded;
-    next();
-  } catch (err) {
-    if (err instanceof jwt.TokenExpiredError) {
-      res.status(401).json({ error: "Session expired. Please log in again." });
-      return;
-    }
-    if (err instanceof jwt.JsonWebTokenError) {
-      res.status(401).json({ error: "Invalid authentication token." });
-      return;
-    }
-    console.error("[auth] JWT verification error:", err);
-    res.status(500).json({ error: "Authentication failed. Please try again." });
-  }
+  requireAuthPg(req, res, next);
 }
 
 /**

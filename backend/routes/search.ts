@@ -9,7 +9,7 @@ import { Router, Response } from "express";
 import { AuthenticatedRequest, requireAuth } from "../middleware/auth.js";
 import { validateQuery } from "../validation/schemas.js";
 import { searchSchema, SearchInput } from "../validation/schemas.js";
-import * as searchService from "../services/searchService.js";
+import { searchTransactionsFts } from "../services/searchServicePg.js";
 
 export const searchRouter = Router();
 
@@ -34,11 +34,7 @@ searchRouter.get(
       const userId = req.user!.id;
       const query = req.query as unknown as SearchInput;
 
-      const results = await searchService.searchAll(userId, query.q, {
-        type: query.type,
-        limit: query.limit,
-        threshold: query.threshold,
-      });
+      const results = await searchTransactionsFts(userId, query.q, { limit: query.limit });
 
       res.json({
         query: query.q,

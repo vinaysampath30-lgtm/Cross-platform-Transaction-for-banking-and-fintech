@@ -89,7 +89,7 @@ ${table(["Criterion", "Maximum", "Evidence / current assessment"], [
 ])}
 
 3. PROJECT OUTPUT SUMMARY
-NexusPay provides account registration/login, multi-currency accounts, internal transfers, beneficiary management, transaction history, notifications, activity logging, and search. The PostgreSQL transfer service validates inputs and uses a database transaction and row locks; the legacy routes still require migration before all banking endpoints use PostgreSQL.
+NexusPay provides PostgreSQL-backed account registration/login, multi-currency accounts, internal transfers, beneficiary management, and transaction history, plus MongoDB-backed notifications and activity logging. Banking routes use PostgreSQL; PostgreSQL schema migrations are applied by the API at startup. The dashboard still displays example banking data and is not yet wired to the account and transaction APIs.
 
 Example successful transfer output (illustrative shape; live values depend on runtime data):
 {
@@ -100,10 +100,10 @@ Example successful transfer output (illustrative shape; live values depend on ru
 }
 
 4. DOCUMENTATION ACCURACY NOTES
-- The search implementation uses term-frequency vectors and cosine similarity; it does not compute inverse document frequency (IDF).
-- Search currently includes transactions and activity logs; it does not include notifications.
-- The implemented search is based on lexical term overlap, not semantic embeddings.
-- Automated tests do not currently measure production transaction accuracy or search precision/recall.
+- Transaction search uses PostgreSQL full-text search; it does not search MongoDB activity logs or notifications.
+- The dashboard uses example data for banking screens. Backend resource APIs exist, but the dashboard does not yet call them.
+- The single-transaction lookup endpoint currently returns HTTP 501.
+- Automated tests do not establish production transaction correctness or search quality.
 `;
 
 writeFileSync(txtPath, content, "utf8");

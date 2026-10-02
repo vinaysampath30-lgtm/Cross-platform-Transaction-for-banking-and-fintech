@@ -15,7 +15,7 @@ const options: swaggerJsdoc.Options = {
       version: "1.0.0",
       description:
         "Cross-Platform Transaction Application for Banking & FinTech. " +
-        "A complete banking backend with polyglot persistence (MySQL + MongoDB), " +
+        "A complete banking backend with PostgreSQL for financial records and MongoDB for activity and notifications, " +
         "JWT authentication, fund transfers, beneficiaries, notifications, and similarity-based search.",
       contact: {
         name: "API Support",

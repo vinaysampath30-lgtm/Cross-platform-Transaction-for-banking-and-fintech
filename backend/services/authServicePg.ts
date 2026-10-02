@@ -30,6 +30,7 @@ export interface UserResponse {
   firstName: string;
   lastName: string;
   email: string;
+  accountNumber: string;
 }
 
 export interface AuthResultPg {
@@ -159,7 +160,6 @@ export async function registerUserPg(
     ipAddress: reqMeta.ipAddress,
     userAgent: reqMeta.userAgent,
   }).catch((err) => console.error("[auth] ActivityLog create failed:", err));
-
   return {
     user: {
       id: userId,
@@ -167,6 +167,7 @@ export async function registerUserPg(
       firstName: firstName.trim(),
       lastName: lastName?.trim() ?? "",
       email: email.toLowerCase(),
+      accountNumber,
     },
     accessToken,
     refreshToken,
@@ -200,6 +201,8 @@ export async function loginUserPg(
     ipAddress: reqMeta.ipAddress,
     userAgent: reqMeta.userAgent,
   }).catch((err) => console.error("[auth] ActivityLog create failed:", err));
+  const { AccountPg } = await import("../db/pg-models/AccountPg.js");
+  const account = await AccountPg.findOne({ where: { user_id: user.id }, attributes: ["account_number"] });
 
   return {
     user: {
@@ -208,6 +211,7 @@ export async function loginUserPg(
       firstName: user.first_name,
       lastName: user.last_name,
       email: user.email,
+      accountNumber: account?.account_number ?? "",
     },
     accessToken,
     refreshToken,

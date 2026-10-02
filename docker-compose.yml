@@ -1,16 +1,9 @@
-# =============================================================================
-# NexusPay Banking API - Docker Compose
-# Services: PostgreSQL + MongoDB + MySQL (migration window) + App
-# =============================================================================
-version: "3.9"
-
 services:
   api:
     build:
       context: .
       dockerfile: Dockerfile
       target: production
-    container_name: nexuspay-api
     restart: unless-stopped
     ports:
       - "3000:3000"
@@ -18,50 +11,31 @@ services:
       NODE_ENV: production
       PORT: 3000
       APP_URL: ${APP_URL:-http://localhost:3000}
-      # PostgreSQL
       PG_HOST: postgres
       PG_PORT: 5432
       PG_USER: nexuspay_app
       PG_PASSWORD: ${PG_PASSWORD:-nexuspay_dev_password}
       PG_NAME: nexuspay
       PG_POOL_MAX: 10
-      # MongoDB
       DB_MONGO_URI: mongodb://mongodb:27017/nexuspay
-      # MySQL (migration window)
-      DB_MYSQL_HOST: mysql
-      DB_MYSQL_PORT: 3306
-      DB_MYSQL_USER: nexuspay_app
-      DB_MYSQL_PASSWORD: ${DB_MYSQL_PASSWORD:-nexuspay_dev_password}
-      DB_MYSQL_NAME: nexuspay
-      # JWT / tokens
       JWT_SECRET: ${JWT_SECRET:-change_this_to_a_secure_32_char_random_string}
       ACCESS_TOKEN_SECRET: ${ACCESS_TOKEN_SECRET:-change_this_access_token_secret_32chars}
       REFRESH_TOKEN_SECRET: ${REFRESH_TOKEN_SECRET:-change_this_refresh_token_secret_32chars}
       COOKIE_SECRET: ${COOKIE_SECRET:-change_this_cookie_secret_value_32chars}
       ACCESS_TOKEN_EXPIRY: 15m
       REFRESH_TOKEN_EXPIRY: 7d
-      # MFA
       MFA_ENABLED: "true"
       TRANSFER_MFA_THRESHOLD: "1000"
-      # Email
       EMAIL_DEV_PREVIEW: "true"
     depends_on:
       postgres:
         condition: service_healthy
       mongodb:
         condition: service_healthy
-    networks:
-      - nexuspay-network
     volumes:
       - api-data:/app/data
     healthcheck:
-      test:
-        [
-          "CMD",
-          "node",
-          "-e",
-          "require('http').get('http://localhost:3000/api/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1) })",
-        ]
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3000/api/health', (r) => { process.exit(r.statusCode === 200 ? 0 : 1) })"]
       interval: 30s
       timeout: 5s
       retries: 3
@@ -69,7 +43,6 @@ services:
 
   postgres:
     image: postgres:16-alpine
-    container_name: nexuspay-postgres
     restart: unless-stopped
     ports:
       - "5432:5432"
@@ -79,20 +52,14 @@ services:
       POSTGRES_PASSWORD: ${PG_PASSWORD:-nexuspay_dev_password}
     volumes:
       - postgres-data:/var/lib/postgresql/data
-      - ./backend/db/migrations/002_postgres_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
-    command: postgres -c shared_preload_libraries=pg_stat_statements
-    networks:
-      - nexuspay-network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U nexuspay_app -d nexuspay"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 15s
 
   mongodb:
     image: mongo:7
-    container_name: nexuspay-mongodb
     restart: unless-stopped
     ports:
       - "27017:27017"
@@ -100,61 +67,13 @@ services:
       MONGO_INITDB_DATABASE: nexuspay
     volumes:
       - mongodb-data:/data/db
-    networks:
-      - nexuspay-network
     healthcheck:
       test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
       interval: 10s
       timeout: 5s
       retries: 5
-      start_period: 20s
-
-  mysql:
-    image: mysql:8.4
-    container_name: nexuspay-mysql
-    restart: unless-stopped
-    ports:
-      - "3307:3306"
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_dev_password}
-      MYSQL_DATABASE: nexuspay
-      MYSQL_USER: nexuspay_app
-      MYSQL_PASSWORD: ${DB_MYSQL_PASSWORD:-nexuspay_dev_password}
-    volumes:
-      - mysql-data:/var/lib/mysql
-      - ./backend/db/migrations/001_initial_schema.sql:/docker-entrypoint-initdb.d/001_schema.sql:ro
-    command:
-      - --character-set-server=utf8mb4
-      - --collation-server=utf8mb4_unicode_ci
-    networks:
-      - nexuspay-network
-    healthcheck:
-      test:
-        [
-          "CMD",
-          "mysqladmin",
-          "ping",
-          "-h",
-          "localhost",
-          "-u",
-          "root",
-          "-p${MYSQL_ROOT_PASSWORD:-root_dev_password}",
-        ]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
-
-networks:
-  nexuspay-network:
-    driver: bridge
 
 volumes:
   postgres-data:
-    driver: local
-  mysql-data:
-    driver: local
   mongodb-data:
-    driver: local
   api-data:
-    driver: local

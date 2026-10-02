@@ -58,7 +58,7 @@ transactionsRouter.post(
         return;
       }
 
-      if (message === "INSUFFICIENT_BALANCE") {
+      if (message === "INSUFFICIENT_BALANCE" || message === "INSUFFICIENT_FUNDS") {
         res.status(400).json({ error: "Insufficient balance for this transfer" });
         return;
       }
@@ -68,7 +68,12 @@ transactionsRouter.post(
         return;
       }
 
-      if (message === "SELF_TRANSFER_NOT_ALLOWED") {
+      if (message === "CURRENCY_MISMATCH") {
+        res.status(400).json({ error: "Recipient account currency does not match" });
+        return;
+      }
+
+      if (message === "SELF_TRANSFER_NOT_ALLOWED" || message === "SELF_TRANSFER") {
         res.status(400).json({ error: "Cannot transfer to your own account" });
         return;
       }

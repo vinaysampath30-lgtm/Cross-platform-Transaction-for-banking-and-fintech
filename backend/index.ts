@@ -6,7 +6,6 @@
  * Architecture:
  *   PostgreSQL: users, accounts, transactions, ledger_entries,
  *               sessions, beneficiaries, outbox_events, otp_challenges
- *   MySQL:      kept for migration window (legacy auth/account data)
  *   MongoDB:    notifications, activity_logs
  *
  * Authentication:
@@ -30,15 +29,8 @@ import { env } from "./config/env.js";
 import { swaggerSpec } from "./config/swagger.js";
 
 // Database initialization
-import { initMySQL } from "./db/mysql.js";
 import { initPostgres } from "./db/postgres.js";
 import { initMongoDB } from "./db/mongodb.js";
-
-// Import MySQL Sequelize models (registers them with MySQL sequelize instance)
-import "./db/models/User.js";
-import "./db/models/Account.js";
-import "./db/models/Transaction.js";
-import "./db/models/Beneficiary.js";
 
 // Import PostgreSQL models (registers them with pg sequelize instance)
 import "./db/pg-models/UserPg.js";
@@ -50,8 +42,8 @@ import "./db/pg-models/OutboxEvent.js";
 import "./db/pg-models/BeneficiaryPg.js";
 import "./db/pg-models/OtpChallenge.js";
 
-// Routes (existing — keep all working)
-import { authRouter } from "./routes/auth-new.js";
+// API routes
+import { authRouter } from "./routes/auth.js";
 import { accountsRouter } from "./routes/accounts.js";
 import { transactionsRouter } from "./routes/transactions.js";
 import { beneficiariesRouter } from "./routes/beneficiaries.js";
@@ -98,11 +90,8 @@ async function startServer() {
   // Validate environment variables before any DB init
   validateEnv();
 
-  // Initialize databases in parallel (MySQL is non-fatal for migration window)
+  // PostgreSQL stores banking records; MongoDB stores activity and notifications.
   await Promise.all([
-    initMySQL().catch((err) => {
-      console.warn("[server] MySQL unavailable (non-fatal during PG migration):", err?.message);
-    }),
     initPostgres(),
     initMongoDB(),
   ]);

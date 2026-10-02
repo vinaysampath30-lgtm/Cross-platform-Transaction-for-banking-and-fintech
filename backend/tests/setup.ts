@@ -10,11 +10,11 @@ import { beforeAll, afterAll, beforeEach, afterEach } from "vitest";
 // Set test environment
 process.env.NODE_ENV = "test";
 process.env.JWT_SECRET = "test_jwt_secret_at_least_32_characters_long";
-process.env.DB_MYSQL_HOST = "localhost";
-process.env.DB_MYSQL_PORT = "3306";
-process.env.DB_MYSQL_USER = "test_user";
-process.env.DB_MYSQL_PASSWORD = "test_password";
-process.env.DB_MYSQL_NAME = "nexuspay_test";
+process.env.PG_HOST = "localhost";
+process.env.PG_PORT = "5432";
+process.env.PG_USER = "test_user";
+process.env.PG_PASSWORD = "test_password";
+process.env.PG_NAME = "nexuspay_test";
 process.env.DB_MONGO_URI = "mongodb://localhost:27017/nexuspay_test";
 process.env.EMAIL_DEV_PREVIEW = "true";
 
@@ -24,7 +24,7 @@ beforeAll(() => {
   console.error = (...args: any[]) => {
     if (
       typeof args[0] === "string" &&
-      (args[0].includes("[mysql]") || args[0].includes("[mongo]"))
+      (args[0].includes("[postgres]") || args[0].includes("[mongo]"))
     ) {
       return; // Suppress DB connection errors in tests
     }

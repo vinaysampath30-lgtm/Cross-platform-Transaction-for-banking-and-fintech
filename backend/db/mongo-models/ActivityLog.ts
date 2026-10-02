@@ -25,7 +25,7 @@ export type ActivityEventType =
   | "security.alert";
 
 export interface IActivityLog extends Document {
-  userId: string; // UUID string from MySQL users table
+  userId: string; // PostgreSQL UUID string
   eventType: ActivityEventType;
   category: "auth" | "account" | "transaction" | "beneficiary" | "security" | "system";
   metadata: Record<string, unknown>; // Flexible JSON for event-specific data

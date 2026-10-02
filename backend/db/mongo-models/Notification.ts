@@ -11,7 +11,7 @@ export type NotificationType = "transaction" | "security" | "system" | "promo";
 export type NotificationPriority = "low" | "normal" | "high" | "urgent";
 
 export interface INotification extends Document {
-  userId: string; // UUID string from MySQL users table
+  userId: string; // PostgreSQL UUID string
   type: NotificationType;
   priority: NotificationPriority;
   title: string;

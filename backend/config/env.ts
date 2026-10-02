@@ -56,7 +56,7 @@ export function validateEnv(): void {
   const missing: string[] = [];
 
   // â”€â”€ Required variables â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  // PostgreSQL is authoritative; MySQL remains optional during route migration.
+  // PostgreSQL is authoritative for banking data.
   const pgHost = required("PG_HOST", missing);
   const pgPortRaw = required("PG_PORT", missing);
   const pgUser = required("PG_USER", missing);
@@ -83,17 +83,6 @@ export function validateEnv(): void {
   }
 
   // â”€â”€ Conditional: MySQL SSL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  const mysqlSslRaw = process.env["DB_MYSQL_SSL"];
-  if (mysqlSslRaw === "true") {
-    const sslCa = process.env["DB_MYSQL_SSL_CA"];
-    if (!sslCa || sslCa.trim() === "") {
-      console.error(
-        "[config] DB_MYSQL_SSL_CA is required when DB_MYSQL_SSL=true"
-      );
-      process.exit(1);
-    }
-  }
-
   // â”€â”€ Conditional: MongoDB TLS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const mongoTlsRaw = process.env["DB_MONGO_TLS"];
   if (mongoTlsRaw === "true") {
@@ -107,17 +96,6 @@ export function validateEnv(): void {
   }
 
   // â”€â”€ Optional: DB_MYSQL_POOL_MAX â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  const poolMaxRaw = process.env["DB_MYSQL_POOL_MAX"];
-  if (poolMaxRaw !== undefined && poolMaxRaw.trim() !== "") {
-    const poolMax = Number(poolMaxRaw);
-    if (!Number.isInteger(poolMax) || poolMax < 1 || poolMax > 100) {
-      console.warn(
-        "[config] DB_MYSQL_POOL_MAX must be an integer between 1 and 100; defaulting to 10"
-      );
-      // Not a fatal error â€” getPoolMax() in mysql.ts applies the same default
-    }
-  }
-
   // â”€â”€ Optional: AUDIT_LOG_RETENTION_DAYS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   const retentionRaw = process.env["AUDIT_LOG_RETENTION_DAYS"];
   if (retentionRaw !== undefined && retentionRaw.trim() !== "") {
@@ -156,37 +134,6 @@ export const env = {
   },
 
   // â”€â”€ MySQL â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
-  get mysqlHost(): string {
-    return process.env["DB_MYSQL_HOST"] ?? "";
-  },
-  get mysqlPort(): number {
-    const raw = process.env["DB_MYSQL_PORT"];
-    const parsed = Number(raw);
-    return Number.isFinite(parsed) && parsed > 0 ? parsed : 3306;
-  },
-  get mysqlUser(): string {
-    return process.env["DB_MYSQL_USER"] ?? "";
-  },
-  get mysqlPassword(): string {
-    return process.env["DB_MYSQL_PASSWORD"] ?? "";
-  },
-  get mysqlName(): string {
-    return process.env["DB_MYSQL_NAME"] ?? "";
-  },
-  get mysqlPoolMax(): number {
-    const raw = process.env["DB_MYSQL_POOL_MAX"];
-    if (raw === undefined || raw.trim() === "") return 10;
-    const parsed = Number(raw);
-    if (!Number.isInteger(parsed) || parsed < 1 || parsed > 100) return 10;
-    return parsed;
-  },
-  get mysqlSsl(): boolean {
-    return process.env["DB_MYSQL_SSL"] === "true";
-  },
-  get mysqlSslCa(): string | undefined {
-    return process.env["DB_MYSQL_SSL_CA"] ?? undefined;
-  },
-
   // â”€â”€ MongoDB â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
   get mongoUri(): string {
     return process.env["DB_MONGO_URI"] ?? "";
@@ -275,14 +222,6 @@ export const env = {
   },
 } as const satisfies {
   nodeEnv: string;
-  mysqlHost: string;
-  mysqlPort: number;
-  mysqlUser: string;
-  mysqlPassword: string;
-  mysqlName: string;
-  mysqlPoolMax: number;
-  mysqlSsl: boolean;
-  mysqlSslCa?: string;
   mongoUri: string;
   mongoTls: boolean;
   mongoTlsCa?: string;

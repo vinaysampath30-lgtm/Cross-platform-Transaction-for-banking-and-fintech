@@ -2,8 +2,7 @@
  * backend/services/searchServicePg.ts
  *
  * PostgreSQL full-text search for transactions.
- * Complements the existing TF-IDF search in searchService.ts.
- * Uses the pre-computed tsvector column + GIN index for performance.
+ * Uses the pre-computed tsvector column and GIN index for transaction search.
  */
 
 import { pgSequelize } from "../db/postgres.js";
